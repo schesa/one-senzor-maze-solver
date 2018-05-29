@@ -1,10 +1,11 @@
+// defines pins numbers
 const int dirR = 4;
 const int dirL = 7;
 const int r = 5;
 const int l = 6;
-// defines pins numbers
 const int trigPin = 10;
 const int echoPin = 9;
+
 // defines variables
 long duration;
 int distance;
@@ -12,13 +13,13 @@ int turnPwm = 170;
 int turnTime = 370;
 
 void setup() {
-  // put your setup code here, to run once:
   pinMode(dirL, OUTPUT);
   pinMode(r, OUTPUT);
   pinMode(l, OUTPUT);
   pinMode(dirR, OUTPUT);  
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
+// neverused encoders
   pinMode(A3, INPUT);
   pinMode(A2, INPUT);
   pinMode(A1, INPUT);
@@ -29,37 +30,46 @@ void setup() {
 }
 
 void loop() {
-  distance= readDistance();
-  Serial.print("Distance: ");
-  Serial.println(distance);
+  distance = readDistance();
+  printDistance();
   if(distance < 6){
     pauseMotors(3);
-    goLeft();
+    goAnyWhere();
   }else{
     go(200);
   }
-//  printEncoders();
 }
-// merge 220-270
-// sta 240-250
 
-void goLeft(){
+void printDistance{
+  Serial.print("Distance: ");
+  Serial.println(distance);
+}
+
+void goAnyWhere(){
   pauseMotors(300);
-    leftFront(turnPwm);
-    rightFront(turnPwm);
-    delay(turnTime);
-    Serial.println("Left turn");
-    pauseMotors(500);
+  turnLeft();
+  Serial.println("Left turn");
+  pauseMotors(500);
     if(readDistance() < 8){
       turnAround();
-    } 
-    if(readDistance() < 8){
-      leftBack(turnPwm);
-      rightBack(turnPwm);
-      delay(turnTime);
-      Serial.println("Left turn");
-      pauseMotors(500);
-    }
+	  if(readDistance() < 8){
+		  turnRight();
+		  Serial.println("Right turn");
+		  pauseMotors(500);
+	  }
+	}
+}
+
+void turnLeft(){
+	leftFront(turnPwm);
+    rightFront(turnPwm);
+    delay(turnTime);
+}
+
+void turnRight(){
+  leftBack(turnPwm);
+  rightBack(turnPwm);
+  delay(turnTime);
 }
 
 void turnAround(){
@@ -120,7 +130,6 @@ void printEncoders(){
 }
 
 int readDistance(){
-  
   // Clears the trigPin
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
@@ -134,4 +143,4 @@ int readDistance(){
   distance= duration*0.034/2;
   // Prints the distance on the Serial Monitor
   return distance;
-  }
+}
